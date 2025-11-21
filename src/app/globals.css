@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 :root {
-  --background: #fefbf3;
+  --background: #fef8e1;
   --foreground: #171717;
   --border: #000000;
 }
@@ -13,7 +13,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #fefbf3;
+    --background: #fef8e1;
     --foreground: #171717;
   }
 }
@@ -36,6 +36,37 @@ body {
   border-radius: 0.75rem;
   padding: 0.5rem 1rem;
   background: #fffb8f;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nb-btn:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 4px 4px 0 0 var(--border);
+  background: #fff176;
+}
+
+.nb-btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: 2px 2px 0 0 var(--border);
+  background: #ffee58;
+}
+
+.nb-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 6px 6px 0 0 #666;
+}
+
+.nb-btn:disabled:hover {
+  transform: none;
+  box-shadow: 6px 6px 0 0 #666;
+  background: #fffb8f;
 }
 .nb-input {
   border: 4px solid var(--border);
@@ -56,12 +87,14 @@ body {
   box-shadow: 3px 3px 0 0 var(--border);
 }
 .nb-tab-active {
-  background: #fcd34d;
-  border-color: #f59e0b;
-  box-shadow: 4px 4px 0 0 #f59e0b;
+  background: #fca5a5;
+  border-color: #dc2626;
+  box-shadow: 4px 4px 0 0 #dc2626;
+  color: #000000;
 }
 .nb-tab-inactive {
   background: #ffffff;
   border-color: #000000;
   box-shadow: 4px 4px 0 0 #000000;
+  color: #000000;
 }
