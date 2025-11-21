@@ -54,7 +54,7 @@ export default function Home() {
         <div className='flex gap-3 mb-6'>
           <button
             className={`nb-tab ${
-              mode === 'login' ? 'bg-white' : 'bg-pink-300'
+              mode === 'login' ? 'nb-tab-active' : 'nb-tab-inactive'
             }`}
             onClick={() => setMode('login')}
           >
@@ -62,7 +62,7 @@ export default function Home() {
           </button>
           <button
             className={`nb-tab ${
-              mode === 'register' ? 'bg-white' : 'bg-pink-300'
+              mode === 'register' ? 'nb-tab-active' : 'nb-tab-inactive'
             }`}
             onClick={() => setMode('register')}
           >

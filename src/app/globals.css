@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 :root {
-  --background: #ffffff;
+  --background: #fffef5;
   --foreground: #171717;
   --border: #000000;
 }
@@ -13,7 +13,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #ffffff;
+    --background: #fffef5;
     --foreground: #171717;
   }
 }
@@ -54,4 +54,12 @@ body {
 .nb-tab:hover {
   transform: translate(1px, 1px);
   box-shadow: 3px 3px 0 0 var(--border);
+}
+.nb-tab-active {
+  background: #fef3c7;
+  border-color: #d97706;
+}
+.nb-tab-inactive {
+  background: #fecaca;
+  border-color: #dc2626;
 }
