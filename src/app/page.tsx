@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from './providers/AuthProvider';
 
 export default function Home() {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [form, setForm] = useState({ username: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
   const router = useRouter();
 
   const submit = async (e: React.FormEvent) => {
@@ -30,16 +32,24 @@ export default function Home() {
         return;
       }
 
-      const res = await signIn('credentials', {
-        username: form.username,
-        password: form.password,
-        redirect: false,
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
       });
 
-      if (res?.error) {
+      if (!res.ok) {
         alert('Login failed');
         return;
       }
+
+      const data = await res.json();
+
+      login({
+        token: data.token,
+        user: data.user,
+      });
+
       router.push('/chat');
     } finally {
       setLoading(false);

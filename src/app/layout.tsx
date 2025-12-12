@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { SessionProvider } from '@/components/SessionProvider';
+import { AuthProvider } from './providers/AuthProvider';
 
 export const metadata: Metadata = {
   title: 'Chat App',
@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className='antialiased'>
-        <SessionProvider>{children}</SessionProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
