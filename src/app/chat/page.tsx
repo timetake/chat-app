@@ -1,21 +1,98 @@
 'use client';
 
-import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useAuth } from '../providers/AuthProvider';
+
+type Conversations = { id: string; name: string };
+type Message = {
+  id: string;
+  conversationId: string;
+  fromMe: boolean;
+  text: string;
+  ts: number;
+};
 
 export default function ChatPage() {
-  const { data: session, status } = useSession();
+  const { user, isLoading, logout } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === 'loading') return;
-    if (!session) {
+    if (isLoading) return;
+    if (!user) {
       router.push('/');
     }
-  }, [session, status, router]);
+  }, [isLoading, user, router]);
 
-  if (status === 'loading') {
+  const [selectedConversationId, setSelectedConversationId] =
+    useState<string>('c1');
+
+  const conversations: Conversations[] = useMemo(
+    () => [
+      { id: 'c1', name: 'Alice' },
+      { id: 'c2', name: 'Bob' },
+      { id: 'c3', name: 'Study Group' },
+    ],
+    [],
+  );
+
+  const allMessages: Message[] = useMemo(
+    () => [
+      {
+        id: 'm1',
+        conversationId: 'c1',
+        fromMe: false,
+        text: 'Hi! How are you?',
+        ts: 1,
+      },
+      {
+        id: 'm2',
+        conversationId: 'c1',
+        fromMe: true,
+        text: 'Good! Building our chat app',
+        ts: 2,
+      },
+      {
+        id: 'm3',
+        conversationId: 'c1',
+        fromMe: false,
+        text: 'Nice, Make it look consistent!',
+        ts: 3,
+      },
+      {
+        id: 'm4',
+        conversationId: 'c2',
+        fromMe: false,
+        text: 'Yo, texting message list',
+        ts: 1,
+      },
+      {
+        id: 'm5',
+        conversationId: 'c2',
+        fromMe: true,
+        text: 'Works, Next: real API',
+        ts: 2,
+      },
+      {
+        id: 'm6',
+        conversationId: 'c3',
+        fromMe: false,
+        text: 'Reminder: homework due Friday',
+        ts: 1,
+      },
+    ],
+    [],
+  );
+
+  const selectedConversation =
+    conversations.find((c) => c.id === selectedConversationId) ??
+    conversations[0];
+
+  const messages = allMessages
+    .filter((m) => m.conversationId === selectedConversation.id)
+    .sort((a, b) => a.ts - b.ts);
+
+  if (isLoading) {
     return (
       <div className='flex items-center justify-center min-h-screen'>
         <div className='nb-card'>Loading...</div>
@@ -23,45 +100,86 @@ export default function ChatPage() {
     );
   }
 
-  if (!session) {
+  if (!user) {
     return null;
   }
 
   return (
     <div className='min-h-screen p-4'>
-      <div className='max-w-4xl mx-auto'>
-        <div className='nb-card mb-4'>
-          <div className='flex justify-between items-center'>
-            <h1 className='text-2xl font-bold'>
-              Welcome, {session.user.username}!
-            </h1>
+      <div className='mx-auto max-w-6xl flex gap-4'>
+        <aside className='w-72 nb-card flex flex-col gap-4'>
+          <div className='flex items-start justify-between gap-3'>
+            <div>
+              <div className='text-lg font-bold tracking-tight'>
+                Conversations
+              </div>
+              <div className='text-sm opacity-80'>
+                Logged in as{' '}
+                <span className='font-semibold'>{user.name ?? user.email}</span>
+              </div>
+            </div>
             <button
-              onClick={() => signOut({ callbackUrl: '/' })}
-              className='nb-btn bg-red-300'
+              type='button'
+              className='nb-btn'
+              onClick={() => {
+                logout();
+                router.push('/');
+              }}
             >
               Logout
             </button>
           </div>
-        </div>
+          <div className='flex flex-col gap-2'>
+            {conversations.map((c) => {
+              const active = c.id === selectedConversationId;
+              return (
+                <button
+                  key={c.id}
+                  type='button'
+                  className={[
+                    'nb-tab text-left',
+                    active ? 'nb-tab-active' : 'nb-tab-inactive',
+                  ].join(' ')}
+                  onClick={() => setSelectedConversationId(c.id)}
+                >
+                  {c.name}
+                </button>
+              );
+            })}
+          </div>
+        </aside>
 
-        <div className='nb-card'>
-          <h2 className='text-xl font-bold mb-4'>Chat Room</h2>
-          <div className='h-96 border-4 border-black rounded-lg p-4 mb-4 bg-gray-50'>
-            <p className='text-gray-500 text-center'>
-              Chat functionality will be implemented here...
-            </p>
+        <main className='flex-1 nb-card flex flex-col'>
+          <div className='flex items-start justify-center gap-3 pb-4 border-b-4 border-black'>
+            <div>
+              <div className='text-lg font-bold tracking-tight'>
+                {selectedConversation.name}
+              </div>
+              <div className='text-sm opacity-80'>
+                Conversation ID:
+                <span className='font-semibold'>{selectedConversation.id}</span>
+              </div>
+            </div>
+            <div className='flex-1 overflow-auto py-4 flex flex-col gap-3'>
+              {messages.length === 0 ? (
+                <div className='opacity-80'>No messages yet.</div>
+              ) : (
+                messages.map((m) => (
+                  <div
+                    key={m.id}
+                    className={`flex ${
+                      m.fromMe ? 'justify-end' : 'justify-start'
+                    }`}
+                  >
+                    <div>
+                      <div>{m.text}</div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
-          <div className='flex gap-2'>
-            <input
-              className='nb-input flex-1'
-              placeholder='Type a message...'
-              disabled
-            />
-            <button className='nb-btn bg-blue-300' disabled>
-              Send
-            </button>
-          </div>
-        </div>
+        </main>
       </div>
     </div>
   );
