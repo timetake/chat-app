@@ -24,6 +24,7 @@ export default function ChatPage() {
     }
   }, [isLoading, user, router]);
 
+  const [messageText, setMessageText] = useState('');
   const [selectedConversationId, setSelectedConversationId] =
     useState<string>('c1');
 
@@ -104,6 +105,14 @@ export default function ChatPage() {
     return null;
   }
 
+  function handleSend() {
+    if (!messageText.trim()) return;
+
+    // connect to api
+
+    setMessageText('');
+  }
+
   return (
     <div className='min-h-screen p-4'>
       <div className='mx-auto max-w-6xl flex gap-4'>
@@ -160,25 +169,53 @@ export default function ChatPage() {
                 <span className='font-semibold'>{selectedConversation.id}</span>
               </div>
             </div>
-            <div className='flex-1 overflow-auto py-4 flex flex-col gap-3'>
+            <div className='flex-1 py-4 flex flex-col gap-3'>
               {messages.length === 0 ? (
                 <div className='opacity-80'>No messages yet.</div>
               ) : (
                 messages.map((m) => (
                   <div
                     key={m.id}
-                    className={`flex ${
+                    className={`flex  ${
                       m.fromMe ? 'justify-end' : 'justify-start'
                     }`}
                   >
-                    <div>
-                      <div>{m.text}</div>
+                    <div
+                      className={[
+                        'max-w-[70%]',
+                        'border-4 border-black rounded-xl px-4 py-2 ',
+                        'shadow-[6px_6px_0_0_#000]',
+                        m.fromMe ? 'bg-[#fffb8f]' : 'bg-white',
+                      ].join(' ')}
+                    >
+                      <div className='text-sm leading-relaxed'>{m.text}</div>
                     </div>
                   </div>
                 ))
               )}
             </div>
           </div>
+          <form
+            className='pt-4 border-t-4 border-black flex gap-3 items-center'
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSend();
+            }}
+          >
+            <input
+              className='nb-input flex-1'
+              placeholder='Type a message'
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+            />
+            <button
+              type='submit'
+              className='nb-btn'
+              disabled={!messageText.trim()}
+            >
+              Send
+            </button>
+          </form>
         </main>
       </div>
     </div>
